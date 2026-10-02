@@ -9,6 +9,10 @@ const CANVAS_HEIGHT = 400;
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
+// キャンバスのサイズを強制設定
+canvas.width = CANVAS_WIDTH;
+canvas.height = CANVAS_HEIGHT;
+
 // ゲーム状態
 let gameState = 'playing'; // playing, gameOver, cleared
 let score = 0;
@@ -34,11 +38,11 @@ class Player {
     update(platforms) {
         // 水平移動
         this.velocityX = 0;
-        if (keys['ArrowLeft'] || keys['a']) {
+        if (keys['ArrowLeft'] || keys['a'] || keys['A']) {
             this.velocityX = -PLAYER_SPEED;
             this.direction = -1;
         }
-        if (keys['ArrowRight'] || keys['d']) {
+        if (keys['ArrowRight'] || keys['d'] || keys['D']) {
             this.velocityX = PLAYER_SPEED;
             this.direction = 1;
         }
@@ -54,7 +58,7 @@ class Player {
         this.y += this.velocityY;
 
         // ジャンプ
-        if ((keys[' '] || keys['ArrowUp'] || keys['w']) && !this.isJumping) {
+        if ((keys[' '] || keys['ArrowUp'] || keys['w'] || keys['W']) && !this.isJumping) {
             this.velocityY = -JUMP_STRENGTH;
             this.isJumping = true;
         }
@@ -183,7 +187,7 @@ class Enemy {
     draw() {
         // 体
         ctx.fillStyle = '#FF8C00';
-        ctx.fillRect(this.x, this.y + 10, this.width, this.height - 10);
+        ctx.fillRect(this.x, this.y, this.width, this.height - 10);
 
         // 頭
         ctx.fillStyle = '#FFD700';
@@ -241,7 +245,7 @@ class Coin {
         ctx.fill();
 
         ctx.strokeStyle = '#FFA500';
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 2;
         ctx.stroke();
     }
 }
@@ -278,6 +282,7 @@ class Goal {
 
         // 星
         ctx.fillStyle = '#FFD700';
+        ctx.beginPath();
         for (let i = 0; i < 5; i++) {
             const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
             const x = this.x + 20 + 8 * Math.cos(angle);
@@ -313,10 +318,10 @@ function initGame() {
         new Platform(300, 150, 150, 20, 'normal'),
     ];
 
-    // 敵配置
+    // 敵配置 - プラットフォームの上に配置
     enemies = [
-        new Enemy(250, 260, 30, 30),
-        new Enemy(500, 240, 30, 30),
+        new Enemy(250, 270, 30, 20),
+        new Enemy(500, 250, 30, 20),
     ];
 
     // コイン配置
@@ -342,7 +347,7 @@ function initGame() {
 
 // メインゲームループ
 function gameLoop() {
-    // クリア
+    // 背景クリア
     ctx.fillStyle = '#87CEEB';
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
