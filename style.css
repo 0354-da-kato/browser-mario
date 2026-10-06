@@ -1,0 +1,258 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    max-width: 900px;
+    width: 100%;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    color: #e74c3c;
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    font-size: 1.2em;
+    color: #333;
+    font-weight: bold;
+}
+
+#gameCanvas {
+    display: block;
+    margin: 0 auto 20px;
+    border: 3px solid #333;
+    background: linear-gradient(180deg, #87CEEB 0%, #E0F6FF 100%);
+    width: 100%;
+    max-width: 800px;
+    height: auto;
+}
+
+.controls {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.controls p {
+    color: #555;
+    margin-bottom: 10px;
+    font-size: 1em;
+}
+
+#restartBtn {
+    padding: 10px 30px;
+    font-size: 1em;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+#restartBtn:hover {
+    background-color: #2980b9;
+}
+
+/* ゲーム画面（ゲームオーバー・クリア画面共通） */
+.game-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(3px);
+}
+
+.game-screen.hidden {
+    display: none;
+}
+
+.modal {
+    background: white;
+    padding: 50px 40px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+    animation: popIn 0.4s ease-out;
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* ゲームオーバー画面のスタイル */
+.game-over-modal {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+}
+
+.game-over-modal .modal-title {
+    color: white;
+    font-size: 2.8em;
+    margin-bottom: 20px;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+.game-over-modal .modal-message {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.3em;
+    margin-bottom: 30px;
+}
+
+/* クリア画面のスタイル */
+.clear-modal {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.clear-modal .modal-title {
+    color: white;
+    font-size: 2.8em;
+    margin-bottom: 20px;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+    animation: bounce 0.6s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+.clear-modal .modal-message {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.3em;
+    margin-bottom: 30px;
+}
+
+/* スコア表示 */
+.score-display {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    color: white;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.score-display p {
+    margin: 8px 0;
+}
+
+/* ボタン共通スタイル */
+.modal-button {
+    padding: 15px 40px;
+    font-size: 1.1em;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.modal-button:hover {
+    transform: scale(1.05);
+}
+
+.modal-button:active {
+    transform: scale(0.98);
+}
+
+/* ゲームオーバーボタン */
+.retry-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.retry-button:hover {
+    background: linear-gradient(135deg, #5568d3 0%, #653a8a 100%);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* クリアボタン */
+.clear-button {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.clear-button:hover {
+    background: linear-gradient(135deg, #3d96e6 0%, #00d9e6 100%);
+    box-shadow: 0 8px 20px rgba(79, 172, 254, 0.4);
+}
+
+@media (max-width: 600px) {
+    .header h1 {
+        font-size: 1.8em;
+    }
+
+    .stats {
+        flex-direction: column;
+        gap: 10px;
+        font-size: 1em;
+    }
+
+    .controls p {
+        font-size: 0.9em;
+    }
+
+    .modal {
+        padding: 30px 20px;
+        margin: 20px;
+    }
+
+    .modal-title {
+        font-size: 2em;
+    }
+
+    .modal-message {
+        font-size: 1.1em;
+    }
+
+    .modal-button {
+        padding: 12px 30px;
+        font-size: 1em;
+    }
+}
