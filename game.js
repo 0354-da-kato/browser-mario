@@ -27,7 +27,7 @@ class Player {
     constructor(x, y) {
         this.x = x;
         this.y = y;
-        this.width = 32;
+        this.width = 24;
         this.height = 48;
         this.velocityY = 0;
         this.velocityX = 0;
@@ -73,6 +73,11 @@ class Player {
                     this.velocityY = 0;
                     this.isJumping = false;
                     isOnGround = true;
+                    
+                    // 移動するプラットフォームの上にいるとき、その速度を引き継ぐ
+                    if (platform.type === 'moving') {
+                        this.x += platform.moveDirection * 2;
+                    }
                 }
                 // 下からの衝突
                 else if (this.velocityY < 0 && this.y - this.velocityY >= platform.y + platform.height - 10) {
@@ -98,22 +103,48 @@ class Player {
     }
 
     draw() {
-        // 体
-        ctx.fillStyle = '#FF0000';
-        ctx.fillRect(this.x, this.y + 16, this.width, this.height - 16);
-
         // 頭
         ctx.fillStyle = '#FFDBAC';
-        ctx.fillRect(this.x + 4, this.y, this.width - 8, 16);
+        ctx.beginPath();
+        ctx.arc(this.x + this.width / 2, this.y + 6, 8, 0, Math.PI * 2);
+        ctx.fill();
 
         // 目
         ctx.fillStyle = '#000000';
-        const eyeX = this.x + 8 + this.direction * 3;
-        ctx.fillRect(eyeX, this.y + 4, 4, 4);
+        ctx.fillRect(this.x + 6, this.y + 3, 3, 3);
+        ctx.fillRect(this.x + 15, this.y + 3, 3, 3);
+
+        // 口
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(this.x + this.width / 2, this.y + 8, 3, 0, Math.PI);
+        ctx.stroke();
 
         // 帽子
         ctx.fillStyle = '#CC0000';
-        ctx.fillRect(this.x, this.y - 4, this.width, 4);
+        ctx.fillRect(this.x + 4, this.y - 2, 16, 5);
+        ctx.fillStyle = '#FF0000';
+        ctx.fillRect(this.x, this.y + 2, 24, 3);
+
+        // 胴体
+        ctx.fillStyle = '#FF0000';
+        ctx.fillRect(this.x + 4, this.y + 14, 16, 16);
+
+        // 腕
+        ctx.fillStyle = '#FFDBAC';
+        ctx.fillRect(this.x - 2, this.y + 14, 6, 4);
+        ctx.fillRect(this.x + 20, this.y + 14, 6, 4);
+
+        // ズボン（青）
+        ctx.fillStyle = '#0000AA';
+        ctx.fillRect(this.x + 6, this.y + 30, 6, 10);
+        ctx.fillRect(this.x + 12, this.y + 30, 6, 10);
+
+        // 靴
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(this.x + 5, this.y + 40, 7, 4);
+        ctx.fillRect(this.x + 12, this.y + 40, 7, 4);
     }
 }
 
@@ -168,12 +199,23 @@ class Enemy {
         this.speed = 2;
         this.moveRange = 150;
         this.baseX = x;
+        this.isDefeated = false;
+        this.defeatedTime = 0;
     }
 
     update() {
-        this.x += this.direction * this.speed;
-        if (Math.abs(this.x - this.baseX) > this.moveRange) {
-            this.direction *= -1;
+        if (!this.isDefeated) {
+            this.x += this.direction * this.speed;
+            if (Math.abs(this.x - this.baseX) > this.moveRange) {
+                this.direction *= -1;
+            }
+        } else {
+            // 倒れている状態の時間をカウント
+            this.defeatedTime++;
+            if (this.defeatedTime > 120) { // 2秒後に復活
+                this.isDefeated = false;
+                this.defeatedTime = 0;
+            }
         }
     }
 
@@ -184,33 +226,57 @@ class Enemy {
                this.y + this.height > rect.y;
     }
 
+    defeat() {
+        this.isDefeated = true;
+        this.defeatedTime = 0;
+    }
+
     draw() {
-        // 体
-        ctx.fillStyle = '#FF8C00';
-        ctx.fillRect(this.x, this.y, this.width, this.height - 10);
+        if (this.isDefeated) {
+            // 倒れている状態
+            ctx.fillStyle = '#FF8C00';
+            ctx.fillRect(this.x, this.y + 8, this.width, 8);
+            
+            // 目（×になっている）
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(this.x + 4, this.y + 2);
+            ctx.lineTo(this.x + 8, this.y + 6);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(this.x + 8, this.y + 2);
+            ctx.lineTo(this.x + 4, this.y + 6);
+            ctx.stroke();
+        } else {
+            // 立っている状態
+            // 体
+            ctx.fillStyle = '#FF8C00';
+            ctx.fillRect(this.x, this.y, this.width, this.height - 10);
 
-        // 頭
-        ctx.fillStyle = '#FFD700';
-        ctx.beginPath();
-        ctx.arc(this.x + this.width / 2, this.y + 8, 10, 0, Math.PI * 2);
-        ctx.fill();
+            // 頭
+            ctx.fillStyle = '#FFD700';
+            ctx.beginPath();
+            ctx.arc(this.x + this.width / 2, this.y + 8, 10, 0, Math.PI * 2);
+            ctx.fill();
 
-        // 目
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(this.x + 5, this.y + 4, 4, 4);
-        ctx.fillRect(this.x + this.width - 9, this.y + 4, 4, 4);
+            // 目
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(this.x + 5, this.y + 4, 4, 4);
+            ctx.fillRect(this.x + this.width - 9, this.y + 4, 4, 4);
 
-        // 角
-        ctx.strokeStyle = '#FF8C00';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(this.x + 8, this.y - 2);
-        ctx.lineTo(this.x + 4, this.y - 8);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(this.x + this.width - 8, this.y - 2);
-        ctx.lineTo(this.x + this.width - 4, this.y - 8);
-        ctx.stroke();
+            // 角
+            ctx.strokeStyle = '#FF8C00';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(this.x + 8, this.y - 2);
+            ctx.lineTo(this.x + 4, this.y - 8);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(this.x + this.width - 8, this.y - 2);
+            ctx.lineTo(this.x + this.width - 4, this.y - 8);
+            ctx.stroke();
+        }
     }
 }
 
@@ -371,7 +437,17 @@ function gameLoop() {
 
             // プレイヤーとの衝突判定
             if (player.isCollidingWith(enemy)) {
-                endGame('ゲームオーバー', 'クッパにやられてしまった...');
+                // 上からの踏みつけチェック
+                if (player.velocityY > 0 && player.y + player.height - 10 < enemy.y + 10) {
+                    // 敵を倒す
+                    enemy.defeat();
+                    player.velocityY = -JUMP_STRENGTH * 0.7; // ジャンプを少し弾ませる
+                    score += 200;
+                    document.getElementById('score').textContent = score;
+                } else if (!enemy.isDefeated) {
+                    // 倒れていない敵に接触したらゲームオーバー
+                    endGame('ゲームオーバー', 'クッパにやられてしまった...');
+                }
             }
         });
 
