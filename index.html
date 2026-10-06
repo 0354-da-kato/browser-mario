@@ -18,14 +18,31 @@
         </div>
         <canvas id="gameCanvas" width="800" height="400"></canvas>
         <div class="controls">
-            <p>操作: ← → キーで移動 | スペースキーでジャンプ</p>
+            <p>操作: ← → キーで移動 | スペースキーでジャンプ | 敵を上から踏む</p>
             <button id="restartBtn">ゲーム再スタート</button>
         </div>
-        <div id="gameOverScreen" class="game-over-screen hidden">
-            <div class="modal">
-                <h2 id="gameOverTitle">ゲームオーバー</h2>
-                <p id="gameOverMessage">ゲームオーバーです</p>
-                <button id="retryBtn">もう一度プレイ</button>
+        <!-- ゲームオーバー画面 -->
+        <div id="gameOverScreen" class="game-screen hidden">
+            <div class="modal game-over-modal">
+                <h2 class="modal-title">💀 ゲームオーバー 💀</h2>
+                <p id="gameOverMessage" class="modal-message">ゲームオーバーです</p>
+                <div class="score-display">
+                    <p>スコア: <span id="gameOverScore">0</span></p>
+                </div>
+                <button id="gameOverRetryBtn" class="modal-button retry-button">もう一度プレイ</button>
+            </div>
+        </div>
+
+        <!-- クリア画面 -->
+        <div id="clearScreen" class="game-screen hidden">
+            <div class="modal clear-modal">
+                <h2 class="modal-title">🎉 クリア! 🎉</h2>
+                <p class="modal-message">ステージをクリアしました!</p>
+                <div class="score-display">
+                    <p>スコア: <span id="clearScore">0</span></p>
+                    <p>集めたコイン: <span id="clearCoins">0</span>/10</p>
+                </div>
+                <button id="clearRetryBtn" class="modal-button clear-button">次のステージへ</button>
             </div>
         </div>
     </div>
